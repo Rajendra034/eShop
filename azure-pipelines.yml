@@ -1,0 +1,46 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: EShop
+
+stages:
+  - stage: BuildStage
+    displayName: Build
+    jobs:
+    - job: Buildjob
+      pool:
+        vmImage: 'windows-latest'
+      steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: '**/Basket.API.csproj'
+          feedsToUse: 'select'
+        displayName: 'restore'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: '**/Basket.API.csproj'
+        displayName: 'Build'
+
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'test'
+          projects: '**/Basket.UnitTests.csproj'
+        displayName: 'Unit-test'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: true
+          arguments: '-o $(Build.ArtifactStagingDirectory)'
+        displayName: 'Publish'
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Build.ArtifactStagingDirectory)'
+          artifact: 'RetailApp'
+        displayName: 'PublishArtifact'
+        
+
+
